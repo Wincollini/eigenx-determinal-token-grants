@@ -35,11 +35,18 @@ curl "https://determinal-api.eigenarcade.com/message?address=YOUR_ETHEREUM_ADDRE
 
 Use your private key to sign the message. Here's how to do it in TypeScript with `viem`:
 
+> **Security**: Never hardcode a private key. Set it as an environment variable before running.
+> ```bash
+> export PRIVATE_KEY=0x...   # your wallet private key
+> export ACCOUNT_ADDRESS=0x... # your wallet address
+> ```
+
 ```typescript
 import { privateKeyToAccount } from 'viem/accounts';
-import { signMessage } from 'viem';
 
-const privateKey = '0x...'; // Your private key
+const privateKey = process.env.PRIVATE_KEY as `0x${string}`;
+if (!privateKey) throw new Error('PRIVATE_KEY env var required');
+
 const account = privateKeyToAccount(privateKey);
 
 const message = "Sign this message to authenticate your grant request for: 0x...";
@@ -81,8 +88,12 @@ import { createWalletClient, http } from 'viem';
 import { mainnet } from 'viem/chains';
 
 const SERVER_URL = 'https://determinal-api.eigenarcade.com';
-const PRIVATE_KEY = '0x...'; // Your private key
-const ACCOUNT_ADDRESS = '0x...'; // Your Ethereum address
+
+const PRIVATE_KEY = process.env.PRIVATE_KEY as `0x${string}`;
+if (!PRIVATE_KEY) throw new Error('PRIVATE_KEY env var required');
+
+const ACCOUNT_ADDRESS = process.env.ACCOUNT_ADDRESS;
+if (!ACCOUNT_ADDRESS) throw new Error('ACCOUNT_ADDRESS env var required');
 
 async function getGrantMessage(address: string) {
   const response = await fetch(`${SERVER_URL}/message?address=${address}`);
